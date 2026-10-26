@@ -1,0 +1,11 @@
+{
+  "executed_code_cells": 11,
+  "trained_models": 105,
+  "execution_blocks": 107,
+  "timed_evaluation_episodes": 2140,
+  "runtime_summary_rows": 37,
+  "figures": 7,
+  "timing_arithmetic_and_percentiles_verified": true,
+  "timing_preserves_previous_physical_outcomes": true,
+  "core_and_personal_notebook_unchanged": true
+}

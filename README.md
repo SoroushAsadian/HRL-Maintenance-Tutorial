@@ -8,7 +8,7 @@ actions, learning algorithms, and executable experiment notebooks.
 
 **Main notebook for Emanuele and other readers:**
 [Maintenance_Experiments_Presentation.ipynb](Maintenance_Experiments_Presentation.ipynb).
-It runs training and execution, saves results and plots, and ends with an
+It runs training and execution, measures both durations per method, saves results and plots, and ends with an
 automatically generated comparison and interpretation of the observed outcomes.
 
 [Comprehensive_RL_HRL_Maintenance_Tutorial.ipynb](Comprehensive_RL_HRL_Maintenance_Tutorial.ipynb)
@@ -83,9 +83,10 @@ parent for the core file. The notebook contains these presentation sessions:
 3. Train every applicable method, save checkpoints/logs, verify reloading, and
    evaluate on held-out seeds.
 4. Display ranked seven-aircraft and one-aircraft results separately.
-5. Save evaluation, training-curve, and training-time figures as PNG and SVG.
-6. Reload the selected fleet controller and execute additional episodes.
-7. Generate and save the results interpretation from the actual tables.
+5. Save evaluation, training-curve, and return-versus-training-time figures as PNG and SVG.
+6. Compare training/execution duration per method and observed one-to-seven-aircraft runtime ratios.
+7. Reload the selected fleet controller and execute additional timed episodes.
+8. Generate and save performance and runtime interpretation from the actual tables.
 
 Default presentation settings use **1,024 simulated training days per seed**, three
 training seeds, 20 evaluation episodes per model, and a 90-day episode horizon.
@@ -99,22 +100,75 @@ Each execution creates `results/presentation_<UTC timestamp>/` containing:
 
 | Output | Contents | GitHub |
 | --- | --- | --- |
-| `manifest.json` | Configuration, seeds, source hash/commit, versions, and completion status. | Included for the recorded presentation run. |
-| `data/` | Raw evaluation episodes, per-seed means, summaries, training episode curves, timing, and selected-controller execution. | Included. |
-| `plots/` | Comparison plots, training curves, and runtime trade-offs in PNG/SVG. | Included. |
+| `manifest.json` | Configuration, seeds, source hash/commit, versions, CPU/thread information, timing boundaries, and completion status. | Included for the recorded presentation run. |
+| `data/` | Raw timed evaluation episodes, training/execution blocks, summaries, episode curves, fleet-size runtime ratios, and selected-controller execution. | Included. |
+| `plots/` | Performance comparisons, training curves, training/execution duration per method, and one-to-seven-aircraft timing ratios in PNG/SVG. | Included. |
 | `results_interpretation.md`, `verification.json` | Generated conclusions and artifact checks. | Included. |
 | `checkpoints/`, `training_logs/` | Every trained model and compressed detailed training log. | Saved locally; excluded from Git. Rerun the notebook to regenerate them. |
 
 Results identify the **best observed** controllers under this fixed budget. They
-do not claim convergence or statistical superiority. Error bars describe
-training-seed variation. Method authority, actor information, decision timing,
+do not claim convergence or statistical superiority. Performance/training error bars describe
+training-seed variation; execution error bars describe measured episode-time
+variation. Method authority, actor information, decision timing,
 parameter counts, and objectives differ; the notebook explains these limits and
 reports the closer `planning_hierarchy` versus `hrl_flat` comparison separately.
 
-The [recorded presentation run](results/presentation_20261026T143049Z) includes
-the [ranked results](results/presentation_20261026T143049Z/data/summary.csv),
-[saved plots](results/presentation_20261026T143049Z/plots), and
-[generated interpretation](results/presentation_20261026T143049Z/results_interpretation.md).
+The [latest timed presentation run](results/presentation_20261026T154304Z) includes
+the [performance results](results/presentation_20261026T154304Z/data/summary.csv),
+[per-method runtime summary](results/presentation_20261026T154304Z/data/runtime_summary.csv),
+[fleet-size timing ratios](results/presentation_20261026T154304Z/data/runtime_fleet_size_ratio.csv),
+[saved plots](results/presentation_20261026T154304Z/plots), and
+[generated interpretation](results/presentation_20261026T154304Z/results_interpretation.md).
+The [original presentation run](results/presentation_20261026T143049Z) remains available.
+
+### Timing protocol and large-model interpretation
+
+Training time surrounds the entire `core.train()` call: model/environment
+initialization, interaction, targets, and optimization. Checkpoint writing and
+evaluation are outside that timer. One discarded 16-day warm-up initializes the
+training framework before recorded runs.
+
+Fixed-weight execution uses `time.perf_counter()` around each complete evaluation
+episode, after one excluded warm-up episode per controller. It includes reset,
+policy decisions, resource arbitration, sensors/filtering, and physical simulation;
+it excludes learning, loading, saving and plotting. This is **end-to-end execution
+time**, rather than isolated neural forward-pass latency. Every held-out episode
+has its own recorded duration. The threshold rule has zero training cost and a
+measured execution cost.
+
+`runtime_summary.csv` reports training mean/standard deviation, execution mean,
+standard deviation and episode percentiles, milliseconds per simulated day, and
+milliseconds per aircraft-day. `execution_runs.csv` records each evaluation block
+and its excluded warm-up duration. Training bars use variation across three
+training seeds; execution bars use the 60 measured episode durations per learned
+method (20 for the fixed rule). These spreads are not confidence intervals.
+
+Both panels use one Torch CPU thread. Hardware, software versions and the timing
+definitions are saved in the manifest. The observed one-to-seven-aircraft ratios
+combine policy, broker and simulator work and depend on the policy's decisions.
+They are a two-size measurement on this machine, not a prediction of large-fleet
+complexity or a GPU benchmark. Repeat at the intended aircraft/resource counts
+and hardware before using these numbers to size the large model.
+
+### Recorded timing comparison (seven aircraft)
+
+Means from the latest CPU rerun; training uses 1,024 simulated days per seed,
+and execution uses fixed weights for one 90-day episode. Full tables and
+variation plots are linked above. These are end-to-end implementation timings.
+
+| Method | Training seconds | Execution milliseconds / episode |
+| --- | ---: | ---: |
+| `threshold` | 0.00 | 238.0 |
+| `options` | 3.14 | 292.4 |
+| `ddmac_aircraft` | 16.12 | 323.9 |
+| `conditional` | 7.15 | 564.0 |
+| `hierarchical_vdn` | 7.69 | 403.4 |
+
+Fastest mean learned-method training: `options`; fastest mean learned
+execution: `options`. The highest-return controller was `hierarchical_vdn`.
+Training/execution leaders need not be the same as return leaders. Small
+timing gaps should be interpreted with the episode/seed variation and
+current policy decision frequencies, rather than as universal algorithm rankings.
 
 ### Personal learning notebook
 

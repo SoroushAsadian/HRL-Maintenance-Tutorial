@@ -1,0 +1,10 @@
+{
+  "execution_seconds": 1.4754198999999062,
+  "execution_episodes": 3,
+  "execution_seconds_per_episode": 0.49180663333330205,
+  "execution_ms_per_simulated_day": 5.464518148147801,
+  "execution_ms_per_aircraft_day": 0.7806454497354001,
+  "execution_p50_episode_seconds": 0.4986358999994991,
+  "execution_p95_episode_seconds": 0.5050600100003976,
+  "warmup_seconds_excluded": 0.48671269999977085
+}

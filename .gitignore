@@ -6,3 +6,6 @@ venv/
 runs/
 .env
 .env.*
+results/presentation_*/checkpoints/
+results/presentation_*/training_logs/
+results/presentation_*/progress.json

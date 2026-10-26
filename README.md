@@ -4,7 +4,17 @@ A teaching and research prototype for opportunistic aircraft maintenance using
 single-agent reinforcement learning (RL), multi-agent reinforcement learning
 (MARL), and hierarchical reinforcement learning (HRL). The project combines a
 synthetic fleet simulator, uncertain condition estimates, constrained maintenance
-actions, learning algorithms, and an executable tutorial notebook.
+actions, learning algorithms, and executable experiment notebooks.
+
+**Main notebook for Emanuele and other readers:**
+[Maintenance_Experiments_Presentation.ipynb](Maintenance_Experiments_Presentation.ipynb).
+It runs training and execution, saves results and plots, and ends with an
+automatically generated comparison and interpretation of the observed outcomes.
+
+[Comprehensive_RL_HRL_Maintenance_Tutorial.ipynb](Comprehensive_RL_HRL_Maintenance_Tutorial.ipynb)
+is Soroush's **personal learning notebook**, with detailed explanations, exercises,
+and solutions. It is supplementary study material rather than the audience's main
+entry point.
 
 The current implementation contains **18 learned configurations** and a fixed
 threshold baseline. Aircraft, crews, and workshops have individual identities;
@@ -39,32 +49,77 @@ replay updates, and concurrent aircraft hierarchies.
 
 | File | Role |
 | --- | --- |
-| [Comprehensive_RL_HRL_Maintenance_Tutorial.ipynb](Comprehensive_RL_HRL_Maintenance_Tutorial.ipynb) | Ten-part tutorial, experiments, comparisons, and optional reference-solution appendix. |
+| [Maintenance_Experiments_Presentation.ipynb](Maintenance_Experiments_Presentation.ipynb) | **Main audience notebook:** experiment settings, all-method training, checkpointed execution, saved metrics/plots, and results interpretation. |
+| [Comprehensive_RL_HRL_Maintenance_Tutorial.ipynb](Comprehensive_RL_HRL_Maintenance_Tutorial.ipynb) | **Personal learning notebook:** ten-part tutorial, exercises, and optional reference solutions. |
 | [maintenance_tutorial_annotated_core.py](maintenance_tutorial_annotated_core.py) | Teaching environments, fleet simulator, policies, method registry, trainers, evaluation, checkpoints, and runner function. |
 | [maintenance_tutorial_annotated_parts_and_solutions.py](maintenance_tutorial_annotated_parts_and_solutions.py) | Namespaced learner helpers and reference solutions. |
 | [maintenance_tutorial_annotated_behavioral_tests.py](maintenance_tutorial_annotated_behavioral_tests.py) | Consolidated behavioral checks and their runner. |
 | [docs/reports](docs/reports) | Original and updated PDF code reports. |
 
-Keep the notebook and all three Python files together. Its setup cell concatenates
+The main presentation notebook imports the core Python file directly. Keep both
+in the repository root. The personal learning notebook needs all three Python
+files together; its setup cell concatenates
 the Python sources and registers an in-memory `maintenance_tutorial` module.
 There is no separate `maintenance_tutorial.py` file to install. Learner functions
 use `part01_`, `part02_`, etc.; reference solutions use `solution01_`, etc.
 Restart the kernel and rerun setup after changing source definitions.
 
-## Run the tutorial
+## Run the main presentation notebook
 
 The recorded working environment uses **Python 3.13**. From the repository folder,
 install the notebook dependencies into the Python environment you will use:
 
 ```bash
-python -m pip install numpy torch gymnasium stable-baselines3 matplotlib nbformat jupyterlab
+python -m pip install numpy torch gymnasium stable-baselines3 matplotlib pandas nbformat jupyterlab
 python -m jupyterlab
 ```
 
-Open `Comprehensive_RL_HRL_Maintenance_Tutorial.ipynb`, select that environment's
-kernel, and run the setup cell before later sections. Existing notebook outputs
-contain the author's local paths; the setup cell also searches the current folder
-and its parent, so the repository need not be placed at that original path.
+Open **`Maintenance_Experiments_Presentation.ipynb`**, select that environment's
+kernel, and run all cells in order. Its setup searches the current folder and its
+parent for the core file. The notebook contains these presentation sessions:
+
+1. Configure the experiment, seeds, output directory, and source provenance.
+2. Identify controller groups and comparison assumptions.
+3. Train every applicable method, save checkpoints/logs, verify reloading, and
+   evaluate on held-out seeds.
+4. Display ranked seven-aircraft and one-aircraft results separately.
+5. Save evaluation, training-curve, and training-time figures as PNG and SVG.
+6. Reload the selected fleet controller and execute additional episodes.
+7. Generate and save the results interpretation from the actual tables.
+
+Default presentation settings use **1,024 simulated training days per seed**, three
+training seeds, 20 evaluation episodes per model, and a 90-day episode horizon.
+The seven-aircraft panel runs 17 neural configurations plus the fixed threshold
+rule. The separate one-aircraft panel includes all 18 learned configurations,
+including MAXQ, plus the rule. This produces 105 trained models; execution can
+take several minutes on a CPU. Change the settings in the first code cell for
+longer experiments.
+
+Each execution creates `results/presentation_<UTC timestamp>/` containing:
+
+| Output | Contents | GitHub |
+| --- | --- | --- |
+| `manifest.json` | Configuration, seeds, source hash/commit, versions, and completion status. | Included for the recorded presentation run. |
+| `data/` | Raw evaluation episodes, per-seed means, summaries, training episode curves, timing, and selected-controller execution. | Included. |
+| `plots/` | Comparison plots, training curves, and runtime trade-offs in PNG/SVG. | Included. |
+| `results_interpretation.md`, `verification.json` | Generated conclusions and artifact checks. | Included. |
+| `checkpoints/`, `training_logs/` | Every trained model and compressed detailed training log. | Saved locally; excluded from Git. Rerun the notebook to regenerate them. |
+
+Results identify the **best observed** controllers under this fixed budget. They
+do not claim convergence or statistical superiority. Error bars describe
+training-seed variation. Method authority, actor information, decision timing,
+parameter counts, and objectives differ; the notebook explains these limits and
+reports the closer `planning_hierarchy` versus `hrl_flat` comparison separately.
+
+The [recorded presentation run](results/presentation_20261026T143049Z) includes
+the [ranked results](results/presentation_20261026T143049Z/data/summary.csv),
+[saved plots](results/presentation_20261026T143049Z/plots), and
+[generated interpretation](results/presentation_20261026T143049Z/results_interpretation.md).
+
+### Personal learning notebook
+
+Open `Comprehensive_RL_HRL_Maintenance_Tutorial.ipynb` for the detailed teaching
+material and run its setup cell first. Its ten parts are:
 
 | Part | Topic |
 | --- | --- |
@@ -287,7 +342,8 @@ Recorded verification for the documented **26 October 2026** version:
 - An all-method runner smoke test trained 17 neural configurations on a two-aircraft
   case and explicitly skipped MAXQ; its one-aircraft path was checked separately.
 
-To run the consolidated suite, run notebook setup and then:
+To run the consolidated suite, open the personal learning notebook, run its setup
+cell, and then execute:
 
 ```python
 helpers.run_checks()

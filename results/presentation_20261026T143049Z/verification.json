@@ -1,0 +1,13 @@
+{
+  "all_methods_covered": true,
+  "all_checkpoint_reloads_verified": true,
+  "training_runs": 105,
+  "evaluation_rows": 2140,
+  "no_duplicate_evaluation_keys": true,
+  "all_returns_finite": true,
+  "comparison_figure_panels": [
+    "fleet_7",
+    "single_1"
+  ],
+  "core_sha256": "a626792817b8f870a1ebe644f25cdf8783d97ed16eaff8652b7fc4060aec7628"
+}

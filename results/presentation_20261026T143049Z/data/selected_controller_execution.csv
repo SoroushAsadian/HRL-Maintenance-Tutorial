@@ -1,0 +1,4 @@
+seed,decisions,learned_planning_opportunities,planning_mode_terminations,availability,return,cost,flight_failures,flights,downtime_aircraft_days,groundings,replacements,rejections,bird_events,hail_events,weather_exposures,unsafe_attempts,coordination_deferrals,option_starts,option_completions
+20000,90,630,0,1.0,90.0,0.0,0.0,630.0,0.0,0.0,0.0,0.0,0.0,5.0,0.0,0.0,0,0,0
+20001,90,630,0,1.0,90.0,0.0,0.0,630.0,0.0,0.0,0.0,0.0,2.0,1.0,7.0,0.0,0,0,0
+20002,90,630,0,1.0,85.42857142857144,320.0,4.0,630.0,0.0,0.0,0.0,0.0,6.0,6.0,7.0,0.0,0,0,0

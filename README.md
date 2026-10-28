@@ -25,13 +25,12 @@ or a reliable performance ranking.
 
 ## Code reports
 
-The reports and their historical versions are included in this repository.
+Both code reports are included in this repository.
 **Start with the revised second report dated 28 October 2026.**
 
 | Report | Scope | How to use it |
 | --- | --- | --- |
-| [Revised second code report, 28 October 2026](docs/reports/code_report_2026-10-28.pdf) · [TeX source](docs/reports/code_report_2026-10-28.tex) | 196 pages covering all 18 learned configurations, current source listings, 2,096 numbered explanations, cleanup changes, and the scope of compatibility checks. | Main implementation reference for the current code. |
-| [Second code report, 26 October 2026](docs/reports/code_report_2026-10-26.pdf) | 205 pages covering the environment, agent and network differences, update equations, and the core before cleanup. | Historical implementation reference before the 28 October cleanup. |
+| [Second code report, revised 28 October 2026](docs/reports/code_report_2026-10-26.pdf) · [TeX source](docs/reports/code_report_2026-10-26.tex) | 196 pages covering all 18 learned configurations, current source listings, 2,096 numbered explanations, cleanup changes, and the scope of compatibility checks. | Main implementation reference for the current code. Replaces the earlier version of the second report. |
 | [Original code report — 22 October 2026](docs/reports/code_report_2026-10-22.pdf) | 74 pages explaining the earlier core implementation, small teaching environments, conditional actions, original fleet controller, temporal options, and the relationship between the library and custom trainers. | Historical foundation and explanation of the earlier design. |
 
 The original report describes the code as it existed on 22 October. Its statements
@@ -40,6 +39,9 @@ are superseded by the updated report and current source. Source-line references
 belong to each report's own version. The reports explain the core file line by
 line; the separate exercises/solutions, tests, and notebook cells are not additional
 line-by-line appendices.
+
+The second report retains its original filename so existing links continue to work.
+Its contents and cover date reflect the 28 October revision.
 
 The original report establishes the simulator/policy/trainer distinction and
 the single-controller foundation. The updated report extends that explanation to

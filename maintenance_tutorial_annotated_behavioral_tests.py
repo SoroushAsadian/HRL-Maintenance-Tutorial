@@ -3,6 +3,7 @@
 
 # Explanation: Define and run the behavioral tests.
 import unittest
+from unittest.mock import patch
 # Explanation: Create a modified copy of the frozen configuration in tests.
 from dataclasses import replace
 # Explanation: Use temporary files to verify checkpoint compatibility without altering saved experiment runs.
@@ -1545,6 +1546,30 @@ class FleetTests(unittest.TestCase):
             self.assertEqual(days, 32)
             # Explanation: Verify the expected equality, shape, range, or numerical property; a mismatch fails the behavioral test.
             self.assertTrue(all((torch.isfinite(p).all() for p in model.parameters())))
+
+
+    def test_critic_only_calls_skip_actor_context(self):
+        env = FleetMaintenanceEnv(self.config())
+        obs, _ = env.reset(seed=133)
+        for model, value_function in (
+            (AircraftPlanningHierarchy(env), 'value'),
+            (FleetOptionCritic(env), 'q_values'),
+        ):
+            with patch.object(model, 'features', side_effect=AssertionError('actor context allocated')):
+                value = getattr(model, value_function)(obs)
+                self.assertTrue(torch.isfinite(value).all())
+                with self.assertRaises(ValueError):
+                    getattr(model, value_function)(obs[:-1])
+
+    def test_reset_rejects_nonfinite_custom_health(self):
+        env = FleetMaintenanceEnv(self.config())
+        for invalid in (float('nan'), float('inf'), -float('inf')):
+            health = np.full((env.config.aircraft, 2, 6), .8)
+            health[0, 0, 0] = invalid
+            with self.assertRaises(ValueError):
+                env.reset(seed=134, options={'health': health})
+        obs, _ = env.reset(seed=134, options={'health': np.full_like(health, .8)})
+        self.assertTrue(np.isfinite(obs).all())
 
 
 # Explanation: Define run_checks with the shown parameters/defaults; its purpose is to load and execute the consolidated behavioral test case class.

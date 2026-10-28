@@ -25,17 +25,19 @@ or a reliable performance ranking.
 
 ## Code reports
 
-Both reports are included in this repository. **Start with the current report.**
+The reports and their historical versions are included in this repository.
+**Start with the revised second report dated 28 October 2026.**
 
 | Report | Scope | How to use it |
 | --- | --- | --- |
-| [Updated code report — 26 October 2026](docs/reports/code_report_2026-10-26.pdf) | 205 pages covering the current environment, all 18 learned configurations, information and network differences, update equations, implementation limits, and 2,099 numbered explanations of nonblank retained core-source lines. | Main implementation reference for the current code. |
+| [Revised second code report, 28 October 2026](docs/reports/code_report_2026-10-28.pdf) · [TeX source](docs/reports/code_report_2026-10-28.tex) | 196 pages covering all 18 learned configurations, current source listings, 2,096 numbered explanations, cleanup changes, and the scope of compatibility checks. | Main implementation reference for the current code. |
+| [Second code report, 26 October 2026](docs/reports/code_report_2026-10-26.pdf) | 205 pages covering the environment, agent and network differences, update equations, and the core before cleanup. | Historical implementation reference before the 28 October cleanup. |
 | [Original code report — 22 October 2026](docs/reports/code_report_2026-10-22.pdf) | 74 pages explaining the earlier core implementation, small teaching environments, conditional actions, original fleet controller, temporal options, and the relationship between the library and custom trainers. | Historical foundation and explanation of the earlier design. |
 
 The original report describes the code as it existed on 22 October. Its statements
 that multi-agent methods were absent, and its older observation/resource layout,
 are superseded by the updated report and current source. Source-line references
-belong to each report's own version. Both reports explain the core file line by
+belong to each report's own version. The reports explain the core file line by
 line; the separate exercises/solutions, tests, and notebook cells are not additional
 line-by-line appendices.
 
@@ -54,7 +56,7 @@ replay updates, and concurrent aircraft hierarchies.
 | [maintenance_tutorial_annotated_core.py](maintenance_tutorial_annotated_core.py) | Teaching environments, fleet simulator, policies, method registry, trainers, evaluation, checkpoints, and runner function. |
 | [maintenance_tutorial_annotated_parts_and_solutions.py](maintenance_tutorial_annotated_parts_and_solutions.py) | Namespaced learner helpers and reference solutions. |
 | [maintenance_tutorial_annotated_behavioral_tests.py](maintenance_tutorial_annotated_behavioral_tests.py) | Consolidated behavioral checks and their runner. |
-| [docs/reports](docs/reports) | Original and updated PDF code reports. |
+| [docs/reports](docs/reports) | Original and revised PDF code reports, with TeX source for the current report. |
 
 The main presentation notebook imports the core Python file directly. Keep both
 in the repository root. The personal learning notebook needs all three Python
@@ -409,6 +411,34 @@ Changing aircraft/resource counts generally changes model dimensions and require
 constructing and training a matching model. Shared weights alone do not establish
 unchanged-weight transfer across fleet sizes. Crew action categories grow as
 `2**crews`, which limits this representation for large resource pools.
+
+## Core cleanup (28 October 2026)
+
+The core retains all 18 method configurations and its existing public interfaces,
+observation/action layouts, and checkpoint state keys. Statement-by-statement
+generated comments and nine repeated imports were removed; docstrings and concise
+model/safety notes remain. Full line-by-line explanations are in the versioned
+PDF reports. The 28 October report uses current source line numbers; older
+reports retain the line numbers of their own source snapshots.
+
+Critic-only calls now validate global observations without constructing repeated
+per-aircraft actor features. Flat action sampling skips unused conditioning-history
+buffers. Shared observation validation preserves the previous shape checks and
+error messages. Custom initial-health arrays now explicitly reject NaN and infinity.
+
+Verification: 45 behavioral checks pass. All 18 methods matched the previous
+implementation's weights, training logs and evaluation in a fixed-seed 64-day
+regression run; a saved checkpoint per method loaded and evaluated identically.
+For batch size 32 on one Torch CPU thread, isolated critic-call microbenchmarks
+improved by about 1.9–2.0× at seven aircraft and 7.9–8.2× at 50 aircraft. At 50
+aircraft, each such call avoids constructing a 22,976,000-byte actor-context
+tensor. These are isolated-call measurements, not full training speedups.
+
+Existing presentation results and timing tables predate this cleanup and retain
+their original source hashes. Rerunning the main notebook records the new source
+hash and produces new measurements. Unused registered network layers were kept
+for checkpoint compatibility; the learning notebook's explanatory links were
+updated without changing its code cells or saved experimental outputs.
 
 ## Current scope and pending work
 
